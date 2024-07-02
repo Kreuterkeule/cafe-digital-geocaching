@@ -1,0 +1,4 @@
+com/kreuterkeule/token_server/config/SecurityConfig.class
+com/kreuterkeule/token_server/TokenServerApplication.class
+com/kreuterkeule/token_server/service/TokenService.class
+com/kreuterkeule/token_server/controller/AppController.class
