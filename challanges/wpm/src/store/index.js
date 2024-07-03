@@ -9,7 +9,7 @@ const vuexLocal = new VuexPersistence({
 
 export default createStore({
   state: {
-    API_URL: 'http://localhost:8080',
+    API_URL: 'http://192.168.88.39:8080',
     language: 'de',
     username: 'admin',
     password: '1234',

@@ -2,25 +2,36 @@
     <div @keydown="() => null" @click="this.activateInput()">
       <ul>
           <li>
-            {{ Math.floor(timer) }} Sekunden
+            {{ Math.floor(timer) }}
+            {{ this.language === 'de' ? 'Sekunden' : 'seconds' }}
           </li>
           <li>
-            {{ Math.floor(cpm) }} Zeichen Pro Minute
+            {{ Math.floor(cpm) }}
+            {{ this.language === 'de' ? 'Zeichen pro Minute' : 'charakters per minute' }}
           </li>
           <li>
-            {{ Math.floor(wpm) }} Wörter pro Minute
+            {{ Math.floor(wpm) }}
+            {{ this.language === 'de' ? 'Wörter pro Minute' : 'words per minute' }}
           </li>
           <li v-if="done">
             Fertig
           </li>
           <li>
-            <button @click="this.$router.go()">Nochmal versuchen</button>
+            <button @click="this.$router.go()">{{ language === 'de'
+            ? 'Nochmal versuchen'
+            : 'Try again' }}</button>
           </li>
         </ul>
     </div>
-    <p class="result" v-html="makeText()"></p>
+    <p @keydown="() => null" @click="this.activateInput()"
+      class="result" v-html="makeText()"></p>
     <p class="code" v-if="code !== ''">
       Du hast es über {{ minWpm }} Wpm geschafft! Das ist dein code: {{ code }}</p>
+      <br>
+      <p class="hint">{{ language === 'de'
+      ? 'Wenn du nicht schreiben kannst, clicke auf den Text oder auf "Nochmal versuchen"'
+      : 'If you can\'t type, try clicking the text or the "Try again" button' }}</p>
+      <p v-if="this.toSlow">Du warst leider zu langsam, bitte versuche es noch einmal</p>
     <!-- hidden input this is used so we won't need keylisteners -->
     <label style="opacity: 0; width: 0; height: 0;" for="input">
       <input  @input="inputHandler()"
@@ -44,6 +55,7 @@ export default defineComponent({
       cpm: 0,
       done: false,
       code: '',
+      toSlow: false,
     };
   },
   mounted() {
@@ -61,7 +73,7 @@ export default defineComponent({
         .join('');
     },
     makeText() {
-      return `${this.colorize()}<span style="color: lightgray;">${this.sentence.substring(this.input.length)}</span>`;
+      return `${this.colorize()}<span style="color: gray;">${this.sentence.substring(this.input.length)}</span>`;
     },
     fetchTimer() {
       if (this.done) return;
@@ -72,7 +84,7 @@ export default defineComponent({
       this.end = Date.now();
       this.timer = (this.end - this.begin) / 1000;
       this.cpm = this.input.length / (this.timer / 60);
-      this.wpm = this.cpm / 6;
+      this.wpm = this.cpm / 5;
     },
     inputHandler() {
       if (!this.timerBegun) {
@@ -92,6 +104,8 @@ export default defineComponent({
       this.$refs.input.blur();
       if (this.wpm > this.minWpm) {
         this.genCode();
+      } else {
+        this.toSlow = true;
       }
     },
     genCode() {
@@ -108,6 +122,11 @@ export default defineComponent({
           .then((t) => {
             this.code = t;
           }));
+    },
+  },
+  computed: {
+    language() {
+      return this.$store.state.language;
     },
   },
 });
@@ -128,6 +147,11 @@ ul {
     display: block;
     padding: 8px;
   }
+}
+
+.hint {
+  color: black;
+  font-size: 10px;
 }
 
 </style>
